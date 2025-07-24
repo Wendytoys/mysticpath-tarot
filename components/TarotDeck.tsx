@@ -39,7 +39,7 @@ export const TarotDeck: React.FC = () => {
         setIsReadingLoading(true);
         setReading('');
         try {
-            const ai = new GoogleGenAI({ apiKey: process.env.API_KEY as string });
+            const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_GEMINI_API_KEY as string });
             const prompt = `You are a mystical tarot reader. Provide a concise three-card reading for the following draw. For each card, briefly state its meaning in its position. Then, provide a short, synthesized summary of the overall narrative.
             - Past: ${selectedCards[0].name}
             - Present: ${selectedCards[1].name}
