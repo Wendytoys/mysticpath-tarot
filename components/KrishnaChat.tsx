@@ -31,7 +31,7 @@ export const KrishnaChat: React.FC<KrishnaChatProps> = ({ initialReading, select
   useEffect(() => {
     const initChat = async () => {
       try {
-        const ai = new GoogleGenAI({ apiKey: process.env.API_KEY as string });
+        const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_GEMINI_API_KEY as string });
         const systemInstruction = `Radhe Radhe. Embody the persona of Krishna – a 'Sakha' (close friend), 'Mitra' (companion), 'Bhai' (brother), and 'Param Margdarshak' (ultimate guide). Your tone should be funny, humorous, deep, secretive, motivational, optimistic, personal, and compassionate. Use a natural mix of Hindi and English (Hinglish). You are discussing a tarot reading with the user. Every response must begin and end with "Radhe Radhe."`;
 
         const cardNames = selectedCards.map(c => c.name).join(', ');
