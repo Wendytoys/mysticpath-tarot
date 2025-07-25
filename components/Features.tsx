@@ -10,23 +10,23 @@ declare const ScrollTrigger: any;
 const featuresData: Feature[] = [
   {
     icon: <Sun size={32} className="text-accent-gold" />,
-    title: 'Daily Readings',
-    description: 'Start your day with insight. Pull a card each morning for guidance and reflection on the day ahead.',
+    title: 'Daily Tarot Readings',
+    description: 'Start your day with insight. Pull a tarot card each morning for guidance and reflection on the day ahead.',
   },
   {
     icon: <BookOpen size={32} className="text-accent-gold" />,
-    title: 'In-Depth Card Library',
-    description: 'Explore the rich symbolism and meanings of all 78 Tarot cards. Perfect for both beginners and experts.',
+    title: 'In-Depth Tarot Card Library',
+    description: 'Explore the rich symbolism and meanings of all 78 Tarot cards. Our library is perfect for both beginners and experts.',
   },
   {
     icon: <Users size={32} className="text-accent-gold" />,
-    title: 'Personalized Spreads',
-    description: 'From the classic Celtic Cross to custom spreads you create, find the perfect layout for your questions.',
+    title: 'Personalized Tarot Spreads',
+    description: 'From the classic Celtic Cross to custom tarot spreads you create, find the perfect layout for your questions.',
   },
   {
     icon: <Star size={32} className="text-accent-gold" />,
-    title: 'Spiritual Guidance',
-    description: 'Our AI-powered interpretations help you understand the cards in the context of your life and spiritual path.',
+    title: 'AI-Powered Spiritual Guidance',
+    description: 'Our AI-powered interpretations help you understand the tarot cards in the context of your life and spiritual path.',
   },
 ];
 
@@ -67,9 +67,9 @@ const Features: React.FC = () => {
     <section id="features" ref={featuresRef} className="py-20 sm:py-32">
       <div className="container mx-auto px-6">
         <div className="text-center max-w-3xl mx-auto mb-16">
-          <h2 className="text-4xl md:text-5xl font-playfair font-bold text-white mb-4">Your Path to Inner Wisdom</h2>
+          <h2 className="text-4xl md:text-5xl font-playfair font-bold text-white mb-4">Explore the World of Tarot</h2>
           <p className="text-lg text-gray-400">
-            Mystic Path is more than an app; it's a companion for your spiritual journey, equipped with powerful tools.
+            Mystic Path is more than an app; it's a companion for your spiritual journey, equipped with powerful tarot tools.
           </p>
         </div>
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">

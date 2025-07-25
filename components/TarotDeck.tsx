@@ -232,6 +232,7 @@ export const TarotDeck: React.FC = () => {
                       ref={el => { cardRefs.current[index] = el; }}
                       key={card.id}
                       image={card.image}
+                      cardName={card.name}
                       isFlipped={(phase === 'revealed' || phase === 'reading' || phase === 'chatting') && isSelected(card)}
                       isSelectable={phase === 'selecting' && selectedCards.length < 3}
                       isSelected={isSelected(card)}

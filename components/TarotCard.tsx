@@ -6,6 +6,7 @@ interface TarotCardProps {
   isSelectable: boolean;
   isSelected: boolean;
   image: string;
+  cardName: string; // Add cardName prop
   onMouseEnter?: () => void;
   onMouseLeave?: () => void;
 }
@@ -13,7 +14,7 @@ interface TarotCardProps {
 const cardBackUrl = 'https://i.imgur.com/3Yd5b1z.jpeg';
 
 export const TarotCard = forwardRef<HTMLDivElement, TarotCardProps>(
-  ({ isFlipped, onClick, isSelectable, isSelected, image, onMouseEnter, onMouseLeave }, ref) => {
+  ({ isFlipped, onClick, isSelectable, isSelected, image, cardName, onMouseEnter, onMouseLeave }, ref) => {
     return (
       <div
         ref={ref}
@@ -24,7 +25,7 @@ export const TarotCard = forwardRef<HTMLDivElement, TarotCardProps>(
       >
         <div className={`card-inner ${isFlipped ? 'is-flipped' : ''}`}>
           <div className="card-face card-face-front">
-            <img src={image} alt="Tarot Card" className="w-full h-full object-cover" />
+            <img src={image} alt={`${cardName} Tarot Card`} className="w-full h-full object-cover" />
           </div>
           <div className="card-face card-face-back">
             <img src={cardBackUrl} alt="Card Back" className="w-full h-full object-cover" />

@@ -25,7 +25,7 @@ const Hero: React.FC = () => {
 
       <div className="relative z-10 container mx-auto px-6 flex flex-col items-center">
         <h1 className="hero-title text-5xl md:text-7xl font-playfair font-bold text-white leading-tight mb-4">
-          Unveil Your Destiny
+          Unveil Your Destiny with a Free Tarot Reading
         </h1>
         <p className="hero-subtitle text-lg md:text-xl text-gray-300 max-w-2xl mx-auto mb-8">
           Draw from the deck for a classic Tarot reading, then discuss your results with our AI-powered spiritual guide.
