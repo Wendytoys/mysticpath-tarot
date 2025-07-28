@@ -34,7 +34,9 @@ const App: React.FC = () => {
   const [hasReadingForToday, setHasReadingForToday] = useState(false);
 
   useEffect(() => {
-    MiniKit.install();
+    MiniKit.install("app_0a727a6d3167f5058844701558a5ed68", {
+      verification_level: VerificationLevel.Orb
+    });
     const miniKitIsInstalled = MiniKit.isInstalled();
     setIsMiniKit(miniKitIsInstalled);
 
@@ -105,6 +107,12 @@ const App: React.FC = () => {
       });
 
       if (finalPayload.status === 'success') {
+        // IMPORTANT: In a real app, you would now send this `finalPayload`
+        // to your backend server. The server would then use your Secret Key
+        // to verify the proof with Worldcoin's servers.
+        // Since we don't have a backend, we'll assume verification is successful
+        // for this demo.
+        console.log("Proof generated successfully! In a real app, this would be sent to a backend for verification.", finalPayload);
         setIsVerified(true);
       } else {
         throw new Error(finalPayload.error_code || 'Verification was not successful.');
