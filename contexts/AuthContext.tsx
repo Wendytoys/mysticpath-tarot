@@ -1,7 +1,6 @@
 import React, { createContext, useState, useEffect, ReactNode, useCallback, useMemo } from 'react';
 import { MiniKit, MiniKitUser } from '@worldcoin/minikit-js';
 
-// Define the interface for our context
 interface AuthContextType {
   user: MiniKitUser | null;
   login: () => void;
@@ -10,10 +9,9 @@ interface AuthContextType {
   isConnected: boolean;
 }
 
-// Create the context
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// --- The Correct Implementation based on Docs and Console Logs ---
+// --- Final Implementation Following Documentation and Error Logs ---
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<MiniKitUser | null>(null);
@@ -49,31 +47,37 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     };
   }, []);
 
-  // Login function using the correct `walletAuth` command
   const login = useCallback(() => {
     console.log('AuthProvider: login function called.');
-    try {
-      // This is the correct command as per the documentation
-      console.log('AuthProvider: Calling MiniKit.commands.walletAuth()...');
-      MiniKit.commands.walletAuth({
-        nonce: crypto.randomUUID(), // Using a client-side nonce for testing. In production, this should come from a backend.
-      });
-    } catch (error) {
-      console.error('AuthProvider: Error during MiniKit.commands.walletAuth():', error);
+    
+    // Strict check based on worlddoc.txt and the latest error message
+    if (MiniKit.isInstalled()) {
+      console.log('AuthProvider: MiniKit is installed. Proceeding with walletAuth.');
+      try {
+        MiniKit.commands.walletAuth({
+          nonce: crypto.randomUUID(),
+        });
+      } catch (error) {
+        console.error('AuthProvider: Error during MiniKit.commands.walletAuth():', error);
+      }
+    } else {
+      // This is the most likely issue.
+      console.error('AuthProvider: MiniKit.isInstalled() returned false. Ensure you are running inside the World App and that your app version is up to date.');
+      alert('This app must be run inside World App.');
     }
   }, []);
 
-  // Logout function
   const logout = useCallback(() => {
     console.log('AuthProvider: logout function called.');
-    try {
-        MiniKit.disconnect();
-    } catch(error) {
-        console.error('AuthProvider: Error during MiniKit.disconnect():', error);
+    if (MiniKit.isInstalled()) {
+        try {
+            MiniKit.disconnect();
+        } catch(error) {
+            console.error('AuthProvider: Error during MiniKit.disconnect():', error);
+        }
     }
   }, []);
 
-  // Memoize the context value to prevent unnecessary re-renders
   const value = useMemo(() => ({ user, login, logout, loading, isConnected }), [user, login, logout, loading, isConnected]);
 
   return (
