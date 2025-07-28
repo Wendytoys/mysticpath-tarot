@@ -3,14 +3,13 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Logo } from './Logo';
 import { useAuth } from '../hooks/useAuth';
-import { GoogleIcon } from './icons/GoogleIcon';
-import { LogOut, BookMarked, Menu, X, Library, Newspaper } from 'lucide-react';
+import { Wallet, LogOut, BookMarked, Menu, X, Library, Newspaper } from 'lucide-react';
 
 const Header: React.FC = () => {
   const [scrolled, setScrolled] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { user, login, logout } = useAuth();
+  const { user, login, logout, isConnected } = useAuth();
   const dropdownRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   const location = useLocation();
@@ -99,7 +98,7 @@ const Header: React.FC = () => {
         Blog
       </Link>
        <hr className="border-gray-700 w-1/2 my-4" />
-       {user ? (
+       {isConnected && user ? (
          <>
           <Link
             to="/journal"
@@ -122,8 +121,8 @@ const Header: React.FC = () => {
             onClick={() => { login(); setIsMenuOpen(false); }}
             className="flex items-center gap-3 bg-accent-purple hover:bg-opacity-80 text-white font-bold py-3 px-6 rounded-full transition-all duration-300 transform hover:scale-105 mt-4 text-xl"
           >
-            <GoogleIcon className="w-6 h-6" />
-            Login with Google
+            <Wallet className="w-6 h-6" />
+            Connect Wallet
           </button>
        )}
     </>
@@ -158,11 +157,11 @@ const Header: React.FC = () => {
             ))}
           </div>
           <div className="hidden md:flex items-center">
-            {user ? (
+            {isConnected && user ? (
               <div className="relative" ref={dropdownRef}>
                 <button onClick={() => setIsDropdownOpen(!isDropdownOpen)} className="flex items-center gap-2">
-                  <img src={user.avatar} alt={user.name} className="w-9 h-9 rounded-full border-2 border-accent-purple" />
-                  <span className="text-white font-medium">{user.name}</span>
+                  <img src={user.profile.picture} alt={user.profile.name || 'User Avatar'} className="w-9 h-9 rounded-full border-2 border-accent-purple" />
+                  <span className="text-white font-medium">{user.profile.name || 'Wallet User'}</span>
                 </button>
                 {isDropdownOpen && (
                   <div className="absolute top-full right-0 mt-2 w-48 bg-secondary-dark rounded-md shadow-lg py-1 border border-gray-700/50">
@@ -189,8 +188,8 @@ const Header: React.FC = () => {
                 onClick={login}
                 className="flex items-center gap-2 bg-accent-purple hover:bg-opacity-80 text-white font-bold py-2 px-4 rounded-full transition-all duration-300 transform hover:scale-105"
               >
-                <GoogleIcon className="w-5 h-5" />
-                Login with Google
+                <Wallet className="w-5 h-5" />
+                Connect Wallet
               </button>
             )}
           </div>

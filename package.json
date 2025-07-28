@@ -10,6 +10,8 @@
   },
   "dependencies": {
     "@google/genai": "latest",
+    "@worldcoin/minikit-js": "^1.9.6",
+    "@worldcoin/minikit-react": "^1.9.7",
     "lucide-react": "^0.525.0",
     "postprocessing": "^6.37.6",
     "react": "^19.1.0",

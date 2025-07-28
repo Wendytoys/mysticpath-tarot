@@ -1,59 +1,38 @@
 
-import React, { createContext, useState, useEffect, ReactNode } from 'react';
-import type { User } from '../types';
+import React, { createContext, ReactNode, useCallback } from 'react';
+import { useMiniKit, MiniKitUser } from '@worldcoin/minikit-react';
 
 interface AuthContextType {
-  user: User | null;
+  user: MiniKitUser | null;
   login: () => void;
   logout: () => void;
   loading: boolean;
+  isConnected: boolean;
 }
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Mock user data for demonstration
-const mockUser: User = {
-  id: '12345',
-  name: 'Radhe Sakha',
-  email: 'devotee@mysticpath.com',
-  avatar: 'https://i.pravatar.cc/150?u=radhesakha',
-};
-
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { isInstalled, isConnected, user, connect, disconnect } = useMiniKit();
 
-  useEffect(() => {
-    try {
-      const storedUser = localStorage.getItem('mystic_user');
-      if (storedUser) {
-        setUser(JSON.parse(storedUser));
-      }
-    } catch (error) {
-      console.error('Failed to parse user from localStorage', error);
-      localStorage.removeItem('mystic_user');
-    } finally {
-      setLoading(false);
+  const login = useCallback(() => {
+    if (isInstalled && !isConnected) {
+      connect();
     }
-  }, []);
+  }, [isInstalled, isConnected, connect]);
 
-  const login = () => {
-    setLoading(true);
-    // In a real app, this would be an API call to a backend for OAuth
-    setTimeout(() => {
-      localStorage.setItem('mystic_user', JSON.stringify(mockUser));
-      setUser(mockUser);
-      setLoading(false);
-    }, 500); // Simulate network delay
-  };
+  const logout = useCallback(() => {
+    if (isConnected) {
+      disconnect();
+    }
+  }, [isConnected, disconnect]);
 
-  const logout = () => {
-    localStorage.removeItem('mystic_user');
-    setUser(null);
-  };
+  // The loading state can be inferred from the MiniKit's connection status
+  // For simplicity, we'll consider it not loading once we know if the wallet is connected.
+  const loading = !isInstalled; 
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, loading }}>
+    <AuthContext.Provider value={{ user, login, logout, loading, isConnected }}>
       {children}
     </AuthContext.Provider>
   );
