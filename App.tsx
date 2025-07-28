@@ -108,18 +108,24 @@ const App: React.FC = () => {
 
       if (finalPayload.status === 'success') {
         try {
+          const action = 'krishna-ji-chat';
           const response = await fetch('/api/verify', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(finalPayload),
+            body: JSON.stringify({
+              payload: finalPayload,
+              action: action,
+              signal: null // We are not using a signal in this app
+            }),
           });
 
+          const verifyResult = await response.json();
+
           if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.detail || 'Verification request failed.');
+            // Use the error code from the verification response
+            throw new Error(verifyResult.code || 'Verification request failed.');
           }
           
-          const verifyResult = await response.json();
           console.log('Backend verification successful:', verifyResult);
           setIsVerified(true);
 

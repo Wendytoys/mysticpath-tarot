@@ -1,48 +1,48 @@
-import * as idkitCore from '@worldcoin/idkit-core';
 
-// This ESM-friendly approach imports the module's entire namespace.
-// We then find the IDKit class within it, whether it's a named or default export.
-const IDKit = idkitCore.IDKit || idkitCore.default;
+import { verifyCloudProof } from '@worldcoin/minikit-js';
 
 export async function onRequestPost(context) {
     try {
-        // Check if IDKit was loaded successfully before using it.
-        if (typeof IDKit !== 'function') {
-            const loadedModuleKeys = JSON.stringify(Object.keys(idkitCore));
-            throw new Error(`IDKit is not a constructor. Loaded module keys: ${loadedModuleKeys}`);
-        }
-
-        const proof = await context.request.json();
-        const secret = context.env.WLD_SECRET_KEY;
+        // The frontend will send the proof payload, action, and signal
+        const { payload, action, signal } = await context.request.json();
+        
+        // Get the App ID from Cloudflare's environment variables
         const app_id = context.env.WLD_APP_ID;
 
-        if (!secret || !app_id) {
+        if (!app_id) {
             return new Response(JSON.stringify({
-                code: 'missing_secrets',
-                detail: 'WLD_APP_ID and WLD_SECRET_KEY must be set in Cloudflare environment.'
+                code: 'missing_app_id',
+                detail: 'WLD_APP_ID must be set in the Cloudflare environment.'
             }), { status: 500, headers: { 'Content-Type': 'application/json' } });
         }
 
-        const idkit = new IDKit({
-            app_id: app_id,
-            action: 'krishna-ji-chat',
-        });
+        // Call the verifyCloudProof function with the data from the frontend
+        const verifyRes = await verifyCloudProof(payload, app_id, action, signal);
 
-        const verifyRes = await idkit.verify(proof, secret);
-        
-        return new Response(JSON.stringify(verifyRes), { 
-            status: 200, 
-            headers: { 'Content-Type': 'application/json' } 
-        });
+        if (verifyRes.success) {
+            // On success, return the successful response
+            return new Response(JSON.stringify(verifyRes), { 
+                status: 200, 
+                headers: { 'Content-Type': 'application/json' } 
+            });
+        } else {
+            // On failure, return the error response from Worldcoin's servers
+            console.error("Cloud proof verification failed:", verifyRes);
+            return new Response(JSON.stringify(verifyRes), { 
+                status: 400, 
+                headers: { 'Content-Type': 'application/json' } 
+            });
+        }
 
     } catch (error) {
-        console.error('Verification failed:', error);
+        // Handle any unexpected errors in the function itself
+        console.error('Verification function handler failed:', error);
         const errorResponse = { 
-            code: error.code || 'verification_failed', 
-            detail: error.message || 'Proof verification failed.' 
+            code: 'handler_error', 
+            detail: error.message || 'An unexpected error occurred.' 
         };
         return new Response(JSON.stringify(errorResponse), { 
-            status: 400, 
+            status: 500, 
             headers: { 'Content-Type': 'application/json' } 
         });
     }
