@@ -1,12 +1,11 @@
-import { IDKit } from '@worldcoin/idkit-core';
 
-// This is the main handler for the Cloudflare Function
+// We are using require here because @worldcoin/idkit-core is a CommonJS module
+const { IDKit } = require('@worldcoin/idkit-core');
+
 export async function onRequestPost(context) {
     try {
-        // The request body is available in context.request
         const proof = await context.request.json();
         
-        // Environment variables are in context.env
         const secret = context.env.WLD_SECRET_KEY;
         const app_id = context.env.WLD_APP_ID;
 
