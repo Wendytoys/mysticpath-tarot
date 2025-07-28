@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Logo } from './Logo';
@@ -13,6 +12,11 @@ const Header: React.FC = () => {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   const location = useLocation();
+
+  const handleLoginClick = () => {
+    console.log('Header: Connect Wallet button clicked.');
+    login();
+  };
 
   useEffect(() => {
     const handleScroll = () => {
@@ -118,7 +122,7 @@ const Header: React.FC = () => {
          </>
        ) : (
           <button 
-            onClick={() => { login(); setIsMenuOpen(false); }}
+            onClick={() => { handleLoginClick(); setIsMenuOpen(false); }}
             className="flex items-center gap-3 bg-accent-purple hover:bg-opacity-80 text-white font-bold py-3 px-6 rounded-full transition-all duration-300 transform hover:scale-105 mt-4 text-xl"
           >
             <Wallet className="w-6 h-6" />
@@ -185,7 +189,7 @@ const Header: React.FC = () => {
               </div>
             ) : (
               <button 
-                onClick={login}
+                onClick={handleLoginClick}
                 className="flex items-center gap-2 bg-accent-purple hover:bg-opacity-80 text-white font-bold py-2 px-4 rounded-full transition-all duration-300 transform hover:scale-105"
               >
                 <Wallet className="w-5 h-5" />
