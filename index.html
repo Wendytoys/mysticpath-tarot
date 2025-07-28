@@ -7,42 +7,12 @@
     <meta name="description" content="Explore the mystical world of Tarot with Mystic Path. Get free tarot readings, learn about card meanings, and discover your destiny with our interactive tarot deck." />
     <meta name="keywords" content="tarot, tarot reading, free tarot reading, online tarot, tarot cards, mystic path, tarot card meanings, destiny, divination" />
     <title>Mystic Path Tarot - Unveil Your Destiny</title>
-    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
-    <script>
-      tailwind.config = {
-        theme: {
-          extend: {
-            colors: {
-              'primary-dark': '#0D0B14',
-              'secondary-dark': '#1A1A2E',
-              'accent-gold': '#F0B43A',
-              'accent-purple': '#9B59B6',
-            },
-            fontFamily: {
-              'playfair': ['"Playfair Display"', 'serif'],
-              'lato': ['Lato', 'sans-serif'],
-            },
-            animation: {
-              'float': 'float 6s ease-in-out infinite',
-              'spin-slow': 'spin 3s linear infinite',
-            },
-            keyframes: {
-              float: {
-                '0%, 100%': { transform: 'translateY(0px)' },
-                '50%': { transform: 'translateY(-20px)' },
-              }
-            }
-          }
-        }
-      }
-    </script>
     <style>
       .card-container {
         perspective: 1000px;
-        /* Width and height are now controlled by GSAP for responsiveness */
       }
       .card-inner {
         position: relative;
@@ -51,8 +21,6 @@
         transition: transform 0.8s;
         transform-style: preserve-3d;
       }
-      /* Removed .selected and :hover transform styles to prevent conflict with GSAP */
-       
       .card-inner.is-flipped {
         transform: rotateY(180deg);
       }
@@ -88,7 +56,6 @@
   }
 }
 </script>
-<link rel="stylesheet" href="/index.css">
 </head>
   <body class="bg-primary-dark">
     <div id="root"></div>

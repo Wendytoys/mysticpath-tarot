@@ -3,7 +3,6 @@ import React, { useEffect } from 'react';
 import { HashRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import Header from './components/Header';
-import Footer from './components/Footer';
 import HomePage from './pages/HomePage';
 import JournalPage from './pages/JournalPage';
 import JournalDetailPage from './pages/JournalDetailPage';
@@ -50,13 +49,12 @@ const App: React.FC = () => {
                 <Route path="/library/:cardName" element={<CardDetailPage />} />
                 <Route path="/blog" element={<BlogPage />} />
                 <Route path="/blog/:slug" element={<BlogPostPage />} />
-              </Routes>
-            </main>
-            <Footer />
+                </Routes>
+              </main>
+            </div>
           </div>
-        </div>
-      </HashRouter>
-    </AuthProvider>
+        </HashRouter>
+      </AuthProvider>
   );
 };
 

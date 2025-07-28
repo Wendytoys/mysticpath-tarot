@@ -11,63 +11,70 @@ interface AuthContextType {
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// --- Implementation based on worlddoc.txt SIWE Flow ---
+// --- Full SIWE Flow Implementation ---
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<MiniKitUser | null>(null);
   const [isConnected, setIsConnected] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [currentNonce, setCurrentNonce] = useState<string | null>(null);
 
-  // This effect handles the response from MiniKit after a command is sent
   useEffect(() => {
     const handleWalletAuthResponse = async (payload: MiniAppWalletAuthSuccessPayload) => {
       console.log('AuthProvider: Received walletAuth response from MiniKit', payload);
       
-      // For now, we will just mark the user as connected on the frontend.
-      // In the next step, we will send this payload to our backend for verification.
-      if (payload.status === 'success') {
-        // This is a temporary connection state. Real connection happens after backend verification.
-        setIsConnected(true); 
-        // We don't have the full user object yet, that comes after verification.
+      if (payload.status === 'success' && currentNonce) {
+        try {
+          console.log('AuthProvider: Verifying signature with backend...');
+          const response = await fetch('/api/verify-siwe', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ payload, nonce: currentNonce }),
+          });
+
+          const verificationResult = await response.json();
+
+          if (response.ok && verificationResult.success) {
+            console.log('AuthProvider: Backend verification successful.');
+            setUser(verificationResult.user);
+            setIsConnected(true);
+          } else {
+            throw new Error(verificationResult.error || 'Backend verification failed');
+          }
+        } catch (error) {
+          console.error('AuthProvider: SIWE verification process failed:', error);
+          alert('Sorry, we could not verify your sign-in. Please try again.');
+          setIsConnected(false);
+          setUser(null);
+        }
       } else {
-        console.error('Wallet auth failed:', payload);
+        console.error('Wallet auth failed or nonce is missing:', payload);
       }
     };
 
-    // Subscribe to the specific event for Wallet Auth
     MiniKit.subscribe('miniapp-wallet-auth', handleWalletAuthResponse);
-    
-    // Set loading to false once subscriptions are set up
     setLoading(false);
 
     return () => {
       MiniKit.unsubscribe('miniapp-wallet-auth', handleWalletAuthResponse);
     };
-  }, []);
+  }, [currentNonce]);
 
-  // This is the login function that starts the SIWE process
   const login = useCallback(async () => {
     console.log('AuthProvider: login function called.');
 
     if (!MiniKit.isInstalled()) {
-      console.error("MiniKit is not installed. Please run in World App.");
       alert("Please use the World App to sign in.");
       return;
     }
 
     try {
-      // Step 1: Fetch the nonce from our backend
-      console.log('AuthProvider: Fetching nonce from /api/nonce...');
       const response = await fetch('/api/nonce');
       const { nonce } = await response.json();
-
-      if (!nonce) {
-        throw new Error('Nonce not received from backend.');
-      }
-      console.log('AuthProvider: Nonce received:', nonce);
-
-      // Step 2: Call walletAuth with the received nonce
-      console.log('AuthProvider: Calling MiniKit.commands.walletAuth...');
+      if (!nonce) throw new Error('Nonce not received from backend.');
+      
+      setCurrentNonce(nonce); // Store nonce to use in the verification step
+      
       MiniKit.commands.walletAuth({
         nonce: nonce,
         statement: 'Welcome to Mystic Path! Sign in to begin your journey.',
@@ -81,9 +88,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const logout = useCallback(() => {
     console.log('AuthProvider: logout function called.');
-    // We will implement a full logout later which might involve clearing backend session
     setIsConnected(false);
     setUser(null);
+    setCurrentNonce(null);
     MiniKit.disconnect();
   }, []);
 
