@@ -107,13 +107,26 @@ const App: React.FC = () => {
       });
 
       if (finalPayload.status === 'success') {
-        // IMPORTANT: In a real app, you would now send this `finalPayload`
-        // to your backend server. The server would then use your Secret Key
-        // to verify the proof with Worldcoin's servers.
-        // Since we don't have a backend, we'll assume verification is successful
-        // for this demo.
-        console.log("Proof generated successfully! In a real app, this would be sent to a backend for verification.", finalPayload);
-        setIsVerified(true);
+        try {
+          const response = await fetch('/api/verify', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(finalPayload),
+          });
+
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.detail || 'Verification request failed.');
+          }
+          
+          const verifyResult = await response.json();
+          console.log('Backend verification successful:', verifyResult);
+          setIsVerified(true);
+
+        } catch (backendError: any) {
+            console.error("Backend verification failed:", backendError);
+            setError(backendError.message || "An error occurred during backend verification.");
+        }
       } else {
         throw new Error(finalPayload.error_code || 'Verification was not successful.');
       }
