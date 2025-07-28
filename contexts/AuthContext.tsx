@@ -13,6 +13,8 @@ interface AuthContextType {
 // Create the context
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+// --- The Correct Implementation based on Docs and Console Logs ---
+
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<MiniKitUser | null>(null);
   const [isConnected, setIsConnected] = useState(false);
@@ -47,31 +49,31 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     };
   }, []);
 
+  // Login function using the correct `walletAuth` command
   const login = useCallback(() => {
     console.log('AuthProvider: login function called.');
-    if (typeof MiniKit.connect === 'function') {
-      try {
-        console.log('AuthProvider: Calling MiniKit.connect()...');
-        MiniKit.connect({
-            appId: 'app_0a727a6d3167f5058844701558a5ed68'
-        });
-      } catch (error) {
-        console.error('AuthProvider: Error during MiniKit.connect():', error);
-      }
-    } else {
-      console.error('AuthProvider: MiniKit.connect is not a function. MiniKit object:', MiniKit);
+    try {
+      // This is the correct command as per the documentation
+      console.log('AuthProvider: Calling MiniKit.commands.walletAuth()...');
+      MiniKit.commands.walletAuth({
+        nonce: crypto.randomUUID(), // Using a client-side nonce for testing. In production, this should come from a backend.
+      });
+    } catch (error) {
+      console.error('AuthProvider: Error during MiniKit.commands.walletAuth():', error);
     }
   }, []);
 
+  // Logout function
   const logout = useCallback(() => {
     console.log('AuthProvider: logout function called.');
-    if (typeof MiniKit.disconnect === 'function') {
-      MiniKit.disconnect();
-    } else {
-      console.error('AuthProvider: MiniKit.disconnect is not a function.');
+    try {
+        MiniKit.disconnect();
+    } catch(error) {
+        console.error('AuthProvider: Error during MiniKit.disconnect():', error);
     }
   }, []);
 
+  // Memoize the context value to prevent unnecessary re-renders
   const value = useMemo(() => ({ user, login, logout, loading, isConnected }), [user, login, logout, loading, isConnected]);
 
   return (
