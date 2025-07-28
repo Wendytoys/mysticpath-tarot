@@ -4,7 +4,6 @@
     "experimentalDecorators": true,
     "useDefineForClassFields": false,
     "module": "ESNext",
-<<<<<<< HEAD
     "lib": [
       "ES2020",
       "DOM",
@@ -16,27 +15,11 @@
     "moduleDetection": "force",
     "allowJs": true,
     "jsx": "react-jsx",
-=======
-    "lib": ["ES2020", "DOM", "DOM.Iterable"],
-    "skipLibCheck": true,
-
-    /* Bundler mode */
-    "moduleResolution": "bundler",
-    "allowImportingTsExtensions": true,
-    "isolatedModules": true,
-    "moduleDetection": "force",
-    "noEmit": true,
-    "allowJs": true,
-    "jsx": "react-jsx",
-
-    /* Linting */
->>>>>>> 8ef47c986f97a8432b6381df6e3decfcb8904424
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true,
-<<<<<<< HEAD
     "paths": {
       "@/*": [
         "./*"
@@ -46,11 +29,3 @@
     "noEmit": true
   }
 }
-=======
-
-    "paths": {
-      "@/*" :  ["./*"]
-    }
-  }
-}
->>>>>>> 8ef47c986f97a8432b6381df6e3decfcb8904424
