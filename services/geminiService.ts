@@ -2,7 +2,12 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { TarotCardData, Reading } from '../types';
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY as string });
+const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+if (!apiKey) {
+  throw new Error("An API Key must be set when running in a browser");
+}
+
+const ai = new GoogleGenAI({ apiKey });
 
 const readingSchema = {
     type: Type.OBJECT,
