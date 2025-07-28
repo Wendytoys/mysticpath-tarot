@@ -1,12 +1,13 @@
-// This import style is more robust for environments like Cloudflare Functions
-// that handle both ESM and CJS modules.
+
+// Robustly import IDKit to handle different module export styles
 const idkitCore = require('@worldcoin/idkit-core');
-const IDKit = idkitCore.IDKit;
+const IDKit = idkitCore.IDKit || idkitCore.default || idkitCore;
 
 export async function onRequestPost(context) {
     try {
-        if (!IDKit) {
-            throw new Error("IDKit could not be loaded from the module.");
+        // A more robust check to see if we loaded the class correctly
+        if (typeof IDKit !== 'function' || !IDKit.prototype.verify) {
+             throw new Error("The IDKit class could not be loaded correctly. Please check package compatibility.");
         }
 
         const proof = await context.request.json();
