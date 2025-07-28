@@ -1,17 +1,18 @@
+import * as idkitCore from '@worldcoin/idkit-core';
 
-// Robustly import IDKit to handle different module export styles
-const idkitCore = require('@worldcoin/idkit-core');
-const IDKit = idkitCore.IDKit || idkitCore.default || idkitCore;
+// This ESM-friendly approach imports the module's entire namespace.
+// We then find the IDKit class within it, whether it's a named or default export.
+const IDKit = idkitCore.IDKit || idkitCore.default;
 
 export async function onRequestPost(context) {
     try {
-        // A more robust check to see if we loaded the class correctly
-        if (typeof IDKit !== 'function' || !IDKit.prototype.verify) {
-             throw new Error("The IDKit class could not be loaded correctly. Please check package compatibility.");
+        // Check if IDKit was loaded successfully before using it.
+        if (typeof IDKit !== 'function') {
+            const loadedModuleKeys = JSON.stringify(Object.keys(idkitCore));
+            throw new Error(`IDKit is not a constructor. Loaded module keys: ${loadedModuleKeys}`);
         }
 
         const proof = await context.request.json();
-        
         const secret = context.env.WLD_SECRET_KEY;
         const app_id = context.env.WLD_APP_ID;
 
