@@ -13,20 +13,14 @@ interface AuthContextType {
 // Create the context
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// --- The Correct Way to Use This Specific MiniKit Version ---
-
-// The imported `MiniKit` is a class with static methods. We call them directly.
-// There is no `init` method. The connection is established by calling `connect`.
-
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<MiniKitUser | null>(null);
   const [isConnected, setIsConnected] = useState(false);
-  const [loading, setLoading] = useState(true); // Start with loading true
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     console.log('AuthProvider: Mounting...');
     
-    // Define the handlers for MiniKit events
     const handleConnect = (u: MiniKitUser) => {
       console.log('AuthProvider: "connected" event received.', u);
       setUser(u);
@@ -39,18 +33,13 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       setIsConnected(false);
     };
 
-    // Subscribe to the events
     console.log('AuthProvider: Subscribing to MiniKit events.');
     MiniKit.subscribe('connected', handleConnect);
     MiniKit.subscribe('disconnected', handleDisconnect);
     
-    // We assume the library is "initialized" by the time we subscribe.
-    // We can't know if the user is already connected without trying to connect,
-    // so we'll set loading to false here.
     setLoading(false);
     console.log('AuthProvider: Ready. Loading state set to false.');
 
-    // Cleanup on unmount
     return () => {
       console.log('AuthProvider: Unsubscribing from MiniKit events.');
       MiniKit.unsubscribe('connected', handleConnect);
@@ -58,13 +47,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     };
   }, []);
 
-  // Login function
   const login = useCallback(() => {
     console.log('AuthProvider: login function called.');
-    if (!isConnected) {
+    if (typeof MiniKit.connect === 'function') {
       try {
         console.log('AuthProvider: Calling MiniKit.connect()...');
-        // The connect method doesn't need appId here, it's handled by World App
         MiniKit.connect({
             appId: 'app_0a727a6d3167f5058844701558a5ed68'
         });
@@ -72,19 +59,19 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         console.error('AuthProvider: Error during MiniKit.connect():', error);
       }
     } else {
-      console.log('AuthProvider: Already connected, login call ignored.');
+      console.error('AuthProvider: MiniKit.connect is not a function. MiniKit object:', MiniKit);
     }
-  }, [isConnected]);
+  }, []);
 
-  // Logout function
   const logout = useCallback(() => {
     console.log('AuthProvider: logout function called.');
-    if (isConnected) {
+    if (typeof MiniKit.disconnect === 'function') {
       MiniKit.disconnect();
+    } else {
+      console.error('AuthProvider: MiniKit.disconnect is not a function.');
     }
-  }, [isConnected]);
+  }, []);
 
-  // Memoize the context value to prevent unnecessary re-renders
   const value = useMemo(() => ({ user, login, logout, loading, isConnected }), [user, login, logout, loading, isConnected]);
 
   return (
