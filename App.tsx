@@ -102,7 +102,7 @@ const App: React.FC = () => {
     setError(null);
     try {
       const { finalPayload } = await MiniKit.commandsAsync.verify({
-        action: 'daily_tarot_reading',
+        action: 'krishna-ji-chat',
         verification_level: VerificationLevel.Orb,
       });
 
@@ -125,7 +125,8 @@ const App: React.FC = () => {
 
         } catch (backendError: any) {
             console.error("Backend verification failed:", backendError);
-            setError(backendError.message || "An error occurred during backend verification.");
+            // Display the specific error from the backend if available
+            setError(`Verification failed: ${backendError.message || "An unknown error occurred."}`);
         }
       } else {
         throw new Error(finalPayload.error_code || 'Verification was not successful.');

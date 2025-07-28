@@ -18,7 +18,7 @@ export async function onRequestPost(context) {
 
         const idkit = new IDKit({
             app_id: app_id,
-            action: 'daily_tarot_reading',
+            action: 'krishna-ji-chat',
         });
 
         const verifyRes = await idkit.verify(proof, secret);
