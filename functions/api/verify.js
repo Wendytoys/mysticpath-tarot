@@ -1,9 +1,14 @@
-
-// We are using require here because @worldcoin/idkit-core is a CommonJS module
-const { IDKit } = require('@worldcoin/idkit-core');
+// This import style is more robust for environments like Cloudflare Functions
+// that handle both ESM and CJS modules.
+const idkitCore = require('@worldcoin/idkit-core');
+const IDKit = idkitCore.IDKit;
 
 export async function onRequestPost(context) {
     try {
+        if (!IDKit) {
+            throw new Error("IDKit could not be loaded from the module.");
+        }
+
         const proof = await context.request.json();
         
         const secret = context.env.WLD_SECRET_KEY;
