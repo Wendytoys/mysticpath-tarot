@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect, ReactNode, useCallback } from 'react';
+import React, { createContext, useState, useEffect, ReactNode, useCallback, useMemo } from 'react';
 import { MiniKit, MiniKitUser } from '@worldcoin/minikit-js';
 
 interface AuthContextType {
@@ -11,6 +11,11 @@ interface AuthContextType {
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+// Create a single instance of MiniKit
+const miniKit = new MiniKit({
+  appId: 'app_0a727a6d3167f5058844701558a5ed68',
+});
+
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<MiniKitUser | null>(null);
   const [isConnected, setIsConnected] = useState(false);
@@ -20,15 +25,13 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     console.log('AuthProvider: Mounting...');
     const initMiniKit = async () => {
       try {
-        console.log('AuthProvider: Initializing MiniKit...');
-        await MiniKit.init({
-          appId: 'app_0a727a6d3167f5058844701558a5ed68',
-        });
+        console.log('AuthProvider: Initializing MiniKit instance...');
+        await miniKit.init();
         console.log('AuthProvider: MiniKit Initialized Successfully.');
 
-        if (MiniKit.user) {
-          console.log('AuthProvider: User already connected.', MiniKit.user);
-          setUser(MiniKit.user);
+        if (miniKit.user) {
+          console.log('AuthProvider: User already connected.', miniKit.user);
+          setUser(miniKit.user);
           setIsConnected(true);
         } else {
           console.log('AuthProvider: User not connected initially.');
@@ -56,13 +59,13 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     };
 
     console.log('AuthProvider: Subscribing to MiniKit events.');
-    MiniKit.subscribe('connected', handleConnect);
-    MiniKit.subscribe('disconnected', handleDisconnect);
+    miniKit.subscribe('connected', handleConnect);
+    miniKit.subscribe('disconnected', handleDisconnect);
 
     return () => {
       console.log('AuthProvider: Unsubscribing from MiniKit events.');
-      MiniKit.unsubscribe('connected', handleConnect);
-      MiniKit.unsubscribe('disconnected', handleDisconnect);
+      miniKit.unsubscribe('connected', handleConnect);
+      miniKit.unsubscribe('disconnected', handleDisconnect);
     };
   }, []);
 
@@ -70,10 +73,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     console.log('AuthProvider: login function called.');
     if (!isConnected) {
       try {
-        console.log('AuthProvider: Calling MiniKit.connect()...');
-        MiniKit.connect();
+        console.log('AuthProvider: Calling miniKit.connect()...');
+        miniKit.connect();
       } catch (error) {
-        console.error('AuthProvider: Error during MiniKit.connect():', error);
+        console.error('AuthProvider: Error during miniKit.connect():', error);
       }
     } else {
       console.log('AuthProvider: Already connected, login call ignored.');
@@ -83,12 +86,14 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const logout = useCallback(() => {
     console.log('AuthProvider: logout function called.');
     if (isConnected) {
-      MiniKit.disconnect();
+      miniKit.disconnect();
     }
   }, [isConnected]);
 
+  const value = useMemo(() => ({ user, login, logout, loading, isConnected }), [user, login, logout, loading, isConnected]);
+
   return (
-    <AuthContext.Provider value={{ user, login, logout, loading, isConnected }}>
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );
