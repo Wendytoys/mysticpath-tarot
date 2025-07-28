@@ -1,5 +1,5 @@
 import React, { createContext, useState, useEffect, ReactNode, useCallback, useMemo } from 'react';
-import { MiniKit, MiniKitUser } from '@worldcoin/minikit-js';
+import { MiniKit, MiniKitUser, MiniAppWalletAuthSuccessPayload } from '@worldcoin/minikit-js';
 
 interface AuthContextType {
   user: MiniKitUser | null;
@@ -11,71 +11,80 @@ interface AuthContextType {
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// --- Final Implementation Following Documentation and Error Logs ---
+// --- Implementation based on worlddoc.txt SIWE Flow ---
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<MiniKitUser | null>(null);
   const [isConnected, setIsConnected] = useState(false);
   const [loading, setLoading] = useState(true);
 
+  // This effect handles the response from MiniKit after a command is sent
   useEffect(() => {
-    console.log('AuthProvider: Mounting...');
-    
-    const handleConnect = (u: MiniKitUser) => {
-      console.log('AuthProvider: "connected" event received.', u);
-      setUser(u);
-      setIsConnected(true);
+    const handleWalletAuthResponse = async (payload: MiniAppWalletAuthSuccessPayload) => {
+      console.log('AuthProvider: Received walletAuth response from MiniKit', payload);
+      
+      // For now, we will just mark the user as connected on the frontend.
+      // In the next step, we will send this payload to our backend for verification.
+      if (payload.status === 'success') {
+        // This is a temporary connection state. Real connection happens after backend verification.
+        setIsConnected(true); 
+        // We don't have the full user object yet, that comes after verification.
+      } else {
+        console.error('Wallet auth failed:', payload);
+      }
     };
 
-    const handleDisconnect = () => {
-      console.log('AuthProvider: "disconnected" event received.');
-      setUser(null);
-      setIsConnected(false);
-    };
-
-    console.log('AuthProvider: Subscribing to MiniKit events.');
-    MiniKit.subscribe('connected', handleConnect);
-    MiniKit.subscribe('disconnected', handleDisconnect);
+    // Subscribe to the specific event for Wallet Auth
+    MiniKit.subscribe('miniapp-wallet-auth', handleWalletAuthResponse);
     
+    // Set loading to false once subscriptions are set up
     setLoading(false);
-    console.log('AuthProvider: Ready. Loading state set to false.');
 
     return () => {
-      console.log('AuthProvider: Unsubscribing from MiniKit events.');
-      MiniKit.unsubscribe('connected', handleConnect);
-      MiniKit.unsubscribe('disconnected', handleDisconnect);
+      MiniKit.unsubscribe('miniapp-wallet-auth', handleWalletAuthResponse);
     };
   }, []);
 
-  const login = useCallback(() => {
+  // This is the login function that starts the SIWE process
+  const login = useCallback(async () => {
     console.log('AuthProvider: login function called.');
-    
-    // Strict check based on worlddoc.txt and the latest error message
-    if (MiniKit.isInstalled()) {
-      console.log('AuthProvider: MiniKit is installed. Proceeding with walletAuth.');
-      try {
-        MiniKit.commands.walletAuth({
-          nonce: crypto.randomUUID(),
-        });
-      } catch (error) {
-        console.error('AuthProvider: Error during MiniKit.commands.walletAuth():', error);
+
+    if (!MiniKit.isInstalled()) {
+      console.error("MiniKit is not installed. Please run in World App.");
+      alert("Please use the World App to sign in.");
+      return;
+    }
+
+    try {
+      // Step 1: Fetch the nonce from our backend
+      console.log('AuthProvider: Fetching nonce from /api/nonce...');
+      const response = await fetch('/api/nonce');
+      const { nonce } = await response.json();
+
+      if (!nonce) {
+        throw new Error('Nonce not received from backend.');
       }
-    } else {
-      // This is the most likely issue.
-      console.error('AuthProvider: MiniKit.isInstalled() returned false. Ensure you are running inside the World App and that your app version is up to date.');
-      alert('This app must be run inside World App.');
+      console.log('AuthProvider: Nonce received:', nonce);
+
+      // Step 2: Call walletAuth with the received nonce
+      console.log('AuthProvider: Calling MiniKit.commands.walletAuth...');
+      MiniKit.commands.walletAuth({
+        nonce: nonce,
+        statement: 'Welcome to Mystic Path! Sign in to begin your journey.',
+      });
+
+    } catch (error) {
+      console.error('AuthProvider: SIWE login process failed:', error);
+      alert('Login failed. Could not get a security token from the server.');
     }
   }, []);
 
   const logout = useCallback(() => {
     console.log('AuthProvider: logout function called.');
-    if (MiniKit.isInstalled()) {
-        try {
-            MiniKit.disconnect();
-        } catch(error) {
-            console.error('AuthProvider: Error during MiniKit.disconnect():', error);
-        }
-    }
+    // We will implement a full logout later which might involve clearing backend session
+    setIsConnected(false);
+    setUser(null);
+    MiniKit.disconnect();
   }, []);
 
   const value = useMemo(() => ({ user, login, logout, loading, isConnected }), [user, login, logout, loading, isConnected]);

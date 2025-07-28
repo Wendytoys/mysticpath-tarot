@@ -161,11 +161,14 @@ const Header: React.FC = () => {
             ))}
           </div>
           <div className="hidden md:flex items-center">
-            {isConnected && user ? (
+            {isConnected ? (
               <div className="relative" ref={dropdownRef}>
                 <button onClick={() => setIsDropdownOpen(!isDropdownOpen)} className="flex items-center gap-2">
-                  <img src={user.profile.picture} alt={user.profile.name || 'User Avatar'} className="w-9 h-9 rounded-full border-2 border-accent-purple" />
-                  <span className="text-white font-medium">{user.profile.name || 'Wallet User'}</span>
+                  {/* Placeholder until we have user data */}
+                  <div className="w-9 h-9 rounded-full bg-accent-purple flex items-center justify-center text-white font-bold">
+                    {user?.profile?.name ? user.profile.name.charAt(0) : 'W'}
+                  </div>
+                  <span className="text-white font-medium">{user?.profile?.name || 'Connected'}</span>
                 </button>
                 {isDropdownOpen && (
                   <div className="absolute top-full right-0 mt-2 w-48 bg-secondary-dark rounded-md shadow-lg py-1 border border-gray-700/50">
