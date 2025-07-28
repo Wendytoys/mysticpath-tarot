@@ -1,5 +1,9 @@
 {
+<<<<<<< HEAD
   "name": "gemini-tarot-reading",
+=======
+  "name": "mystic-path-tarot",
+>>>>>>> 8ef47c986f97a8432b6381df6e3decfcb8904424
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -9,6 +13,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+<<<<<<< HEAD
     "react": "^19.1.0",
     "@google/genai": "^1.11.0",
     "react-dom": "^19.1.0",
@@ -17,6 +22,25 @@
   "devDependencies": {
     "@types/node": "^22.14.0",
     "typescript": "~5.8.2",
+=======
+    "@google/genai": "latest",
+    "@worldcoin/minikit-js": "^1.9.6",
+    "@worldcoin/minikit-react": "^1.9.7",
+    "lucide-react": "^0.525.0",
+    "postprocessing": "^6.37.6",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "react-router-dom": "^7.7.0",
+    "three": "^0.178.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.11",
+    "@types/node": "^22.14.0",
+    "autoprefixer": "^10.4.21",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^4.1.11",
+    "typescript": "~5.7.2",
+>>>>>>> 8ef47c986f97a8432b6381df6e3decfcb8904424
     "vite": "^6.2.0"
   }
 }
